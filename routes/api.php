@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\WorkshopController;
 use Illuminate\Support\Facades\Route;
 
 // Публичные маршруты
+Route::prefix('v1')->group(function() {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -38,4 +39,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/registrations/{registration}', [RegistrationController::class, 'show']);
     Route::patch('/registrations/{registration}/status', [RegistrationController::class, 'updateStatus']);
     Route::delete('/registrations/{registration}', [RegistrationController::class, 'destroy']);
+});
 });

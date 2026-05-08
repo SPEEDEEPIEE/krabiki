@@ -25,7 +25,7 @@ class RegistrationTest extends TestCase
         ]);
 
         Sanctum::actingAs(User::factory()->create(['role' => 'participant']));
-        $this->postJson('/api/registrations', ['workshop_id' => $w->id])
+        $this->postJson('/api/v1/registrations', ['workshop_id' => $w->id])
             ->assertStatus(201)->assertJsonPath('data.status', 'pending');
     }
 
@@ -47,7 +47,7 @@ class RegistrationTest extends TestCase
 
         $u3 = User::factory()->create(['role' => 'participant']);
         Sanctum::actingAs($u3);
-        $this->postJson('/api/registrations', ['workshop_id' => $w->id])
+        $this->postJson('/api/v1/registrations', ['workshop_id' => $w->id])
            ->assertStatus(422)->assertJson(['message' => 'К сожалению, все места заняты. Попробуйте другой мастер-класс.']);
     }
 
@@ -67,7 +67,7 @@ class RegistrationTest extends TestCase
         $r = Registration::create(['workshop_id' => $w2->id, 'participant_user_id' => $p->id, 'status' => 'pending']);
 
         Sanctum::actingAs($o1u);
-        $this->patchJson("/api/registrations/{$r->id}/status", ['status' => 'approved'])
+        $this->patchJson("/api/v1/registrations/{$r->id}/status", ['status' => 'approved'])
             ->assertStatus(403);
     }
 }

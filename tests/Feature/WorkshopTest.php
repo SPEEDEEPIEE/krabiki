@@ -20,7 +20,7 @@ class WorkshopTest extends TestCase
         Organizer::factory()->create();
         Workshop::factory()->count(5)->create();
 
-        $this->getJson('/api/workshops')
+        $this->getJson('/api/v1/workshops')
             ->assertStatus(200)
             ->assertJsonStructure(['data', 'meta']);
     }
@@ -33,7 +33,7 @@ class WorkshopTest extends TestCase
         Workshop::factory()->create(['organizer_id' => $o1->id, 'venue_id' => $v->id]);
         Workshop::factory()->create(['organizer_id' => $o2->id, 'venue_id' => $v->id]);
 
-        $this->getJson('/api/workshops?organizer_id=' . $o1->id)
+        $this->getJson('/api/v1/workshops?organizer_id=' . $o1->id)
             ->assertStatus(200)
             ->assertJsonCount(1, 'data');
     }
@@ -45,7 +45,7 @@ class WorkshopTest extends TestCase
         Organizer::factory()->create(['user_id' => $u->id]);
         Sanctum::actingAs($u);
 
-        $this->postJson('/api/workshops', [
+        $this->postJson('/api/v1/workshops', [
             'venue_id' => $v->id,
             'title' => 'Test Workshop',
             'starts_at' => now()->addDay()->toDateTimeString(),
@@ -60,7 +60,7 @@ class WorkshopTest extends TestCase
         $v = Venue::factory()->create();
         Sanctum::actingAs(User::factory()->create(['role' => 'participant']));
 
-        $this->postJson('/api/workshops', [
+        $this->postJson('/api/v1/workshops', [
             'venue_id' => $v->id,
             'title' => 'Test Workshop',
             'starts_at' => now()->addDay()->toDateTimeString(),
