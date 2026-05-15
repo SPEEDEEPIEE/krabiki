@@ -1,0 +1,758 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Workshops API",
+        "description": "REST API для управления мастер-классами, площадками и регистрациями. Вариант 15.",
+        "version": "2.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Регистрация нового пользователя",
+                "operationId": "5d4fa5d5607ed675ba93907e1fc94534",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Иван Петров"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ivan@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "participant",
+                                            "organizer"
+                                        ],
+                                        "example": "participant"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешная регистрация"
+                    },
+                    "422": {
+                        "description": "Ошибка валидации"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Вход в систему",
+                "operationId": "67d6d0fdd54fba132e1b6f55ca254183",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "organizer@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешный вход"
+                    },
+                    "401": {
+                        "description": "Неверные учётные данные"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Выход из системы",
+                "operationId": "28d48c13fca984400ac8de99f54ee13a",
+                "responses": {
+                    "200": {
+                        "description": "Успешный выход"
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "tags": [
+                    "Аутентификация"
+                ],
+                "summary": "Профиль текущего пользователя",
+                "operationId": "bc2032a379aa97707ccc61511897c120",
+                "responses": {
+                    "200": {
+                        "description": "Данные профиля"
+                    },
+                    "401": {
+                        "description": "Не авторизован"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/registrations": {
+            "get": {
+                "tags": [
+                    "Регистрации"
+                ],
+                "summary": "Список регистраций",
+                "operationId": "06c75149e7578f6afe82f9e777295345",
+                "parameters": [
+                    {
+                        "name": "workshop_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Регистрации"
+                ],
+                "summary": "Записаться на мастер-класс",
+                "operationId": "486bd12e272c6cd70212c3d9a89c572b",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "workshop_id"
+                                ],
+                                "properties": {
+                                    "workshop_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Заявка создана"
+                    },
+                    "422": {
+                        "description": "Ошибка"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/registrations/{id}": {
+            "get": {
+                "tags": [
+                    "Регистрации"
+                ],
+                "summary": "Просмотр регистрации",
+                "operationId": "341f136d217169b991f40091c8985a26",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Регистрации"
+                ],
+                "summary": "Удалить регистрацию",
+                "operationId": "938bad9ae871867192492cf2b889a32c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/registrations/{id}/status": {
+            "patch": {
+                "tags": [
+                    "Регистрации"
+                ],
+                "summary": "Изменить статус заявки",
+                "operationId": "e4def05e2271c9e0f48b6e195604eb0b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "cancelled"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/venues": {
+            "get": {
+                "tags": [
+                    "Площадки"
+                ],
+                "summary": "Список площадок",
+                "operationId": "b3d0a1c57452d0d30bba9b40560f2d18",
+                "responses": {
+                    "200": {
+                        "description": "Список площадок с пагинацией"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Площадки"
+                ],
+                "summary": "Создать площадку (только админ)",
+                "operationId": "0bbda601ee6beea68a0b232049f2d9e2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "capacity"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Новая студия"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "ул. Пушкина, д. 10"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 50
+                                    },
+                                    "hourly_fee": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Площадка создана"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/venues/{id}": {
+            "get": {
+                "tags": [
+                    "Площадки"
+                ],
+                "summary": "Просмотр площадки",
+                "operationId": "b3b661a990ba6616b68e7bab9c723951",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Данные площадки"
+                    },
+                    "404": {
+                        "description": "Не найдено"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Площадки"
+                ],
+                "summary": "Удалить площадку (только админ)",
+                "operationId": "8be672420720a9436f5d19173758794a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Удалено"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Площадки"
+                ],
+                "summary": "Обновить площадку (только админ)",
+                "operationId": "08b2d10cc70933d4154d1d97dd1eb228",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Обновлённая студия"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 30
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Обновлено"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/workshops": {
+            "get": {
+                "tags": [
+                    "Мастер-классы"
+                ],
+                "summary": "Список мастер-классов с фильтрами",
+                "operationId": "c40ca0df753176004d52fc9f4c1fad87",
+                "parameters": [
+                    {
+                        "name": "organizer_id",
+                        "in": "query",
+                        "description": "Фильтр по организатору",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "С даты",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "has_available_spots",
+                        "in": "query",
+                        "description": "Только с местами",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Сортировка (-starts_at, price, title)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список с пагинацией"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Мастер-классы"
+                ],
+                "summary": "Создать мастер-класс (организатор/админ)",
+                "operationId": "fc091eada51a654b90f223e0b1cb8cb0",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "venue_id",
+                                    "title",
+                                    "starts_at",
+                                    "ends_at",
+                                    "max_participants"
+                                ],
+                                "properties": {
+                                    "venue_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Мастер-класс по рисованию"
+                                    },
+                                    "starts_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-12-25 10:00:00"
+                                    },
+                                    "ends_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-12-25 13:00:00"
+                                    },
+                                    "max_participants": {
+                                        "type": "integer",
+                                        "example": 20
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 1500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Создано"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/workshops/{id}": {
+            "get": {
+                "tags": [
+                    "Мастер-классы"
+                ],
+                "summary": "Просмотр мастер-класса",
+                "operationId": "b702494f8c6daccf975238aa1f10128f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Данные"
+                    },
+                    "404": {
+                        "description": "Не найдено"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Мастер-классы"
+                ],
+                "summary": "Удалить мастер-класс (владелец/админ)",
+                "operationId": "18cfdefb992b9166d26b1cdd92b58a51",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Удалено"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Мастер-классы"
+                ],
+                "summary": "Обновить мастер-класс (владелец/админ)",
+                "operationId": "97bd47b9350a0d6391b23eff5803cb7e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Новое название"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Обновлено"
+                    },
+                    "403": {
+                        "description": "Нет прав"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "Sanctum",
+                "description": "Вставьте токен в формате: Bearer {token}"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Аутентификация",
+            "description": "Регистрация, вход, выход"
+        },
+        {
+            "name": "Регистрации",
+            "description": "Запись на мастер-классы"
+        },
+        {
+            "name": "Площадки",
+            "description": "Управление площадками"
+        },
+        {
+            "name": "Мастер-классы",
+            "description": "Управление мастер-классами"
+        }
+    ]
+}
